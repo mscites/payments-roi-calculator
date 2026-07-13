@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalis | Digital Payments ROI Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Catalis brand tokens (per Style Guide V5, Apr 2026) */
+    --navy:#163561;         /* Catalis Navy - primary */
+    --navy-soft:#4A5780;    /* Navy 70% tint - secondary text on navy */
+    --navy-pale:#D5D7E3;    /* Navy 10% tint - hairlines on light bg */
+    --green:#7ABDA0;        /* Catalis Green - primary */
+    --green-pale:#EEF6F1;   /* Green 10% tint - panel fills */
+    --green-mid:#9FCDB9;    /* Green 70% tint */
+    --coral:#E09574;        /* Coral - secondary, used sparingly */
+    --coral-pale:#FBF1EA;   /* Coral 10% tint */
+    --yellow:#F3CD5B;       /* Yellow - secondary, used sparingly */
+    --ink:#302D2D;          /* Dark Gray - body text */
+    --line:#A9ABAC;         /* Light Gray - dividers */
+    --bg:#F4F5F7;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 24px 64px;
+  }
+
+  /* HEADER */
+  .topbar{
+    background:var(--navy);
+    margin:0 -1000px 36px;
+    padding:28px 1000px 26px;
+  }
+  .topbar-inner{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .brandmark{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brandmark .word{
+    font-family:'Poppins',sans-serif;
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:0.06em;
+    color:var(--white);
+  }
+  .chevrons{width:26px;height:24px;}
+  .eyebrow{
+    font-family:'Inter',sans-serif;
+    font-size:11.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--green-mid);
+    margin:0 0 6px;
+    font-weight:600;
+  }
+  h1{
+    font-family:'Poppins',sans-serif;
+    font-weight:600;
+    font-size:30px;
+    line-height:1.15;
+    margin:0;
+    color:var(--white);
+    max-width:520px;
+  }
+  .topbar p{
+    font-size:13.5px;
+    color:var(--navy-soft);
+    color:#B9C2D6;
+    max-width:340px;
+    margin:0;
+    line-height:1.55;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:minmax(300px,380px) 1fr;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width:860px){
+    .grid{grid-template-columns:1fr;}
+    .topbar{padding-left:24px;padding-right:24px;margin-left:0;margin-right:0;}
+  }
+
+  /* INPUT PANEL */
+  .panel{
+    background:var(--white);
+    border:1px solid var(--navy-pale);
+    border-radius:10px;
+    padding:28px;
+  }
+  .panel h2{
+    font-family:'Poppins',sans-serif;
+    font-size:18px;
+    font-weight:600;
+    margin:0 0 4px;
+    color:var(--navy);
+  }
+  .panel .sub{
+    font-size:12.5px;
+    color:#6B7280;
+    margin:0 0 22px;
+  }
+  .field{margin-bottom:20px;}
+  .field label{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:13px;
+    color:var(--ink);
+    font-weight:500;
+    margin-bottom:8px;
+    gap:8px;
+  }
+  .field label span.hint{
+    color:#8A8F98;
+    font-weight:400;
+    font-size:11.5px;
+  }
+  .input-row{
+    display:flex;
+    align-items:center;
+    background:var(--bg);
+    border:1px solid var(--navy-pale);
+    border-radius:7px;
+    overflow:hidden;
+    transition:border-color .15s;
+  }
+  .input-row:focus-within{
+    border-color:var(--green);
+  }
+  .input-row .affix{
+    padding:0 12px;
+    font-family:'Poppins',sans-serif;
+    font-size:13px;
+    color:#8A8F98;
+    border-right:1px solid var(--navy-pale);
+  }
+  .input-row .affix.right{
+    border-right:none;
+    border-left:1px solid var(--navy-pale);
+  }
+  .input-row input[type=number]{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:var(--navy);
+    font-family:'Poppins',sans-serif;
+    font-weight:500;
+    font-size:15px;
+    padding:11px 12px;
+    width:100%;
+  }
+  .input-row input[type=number]::-webkit-outer-spin-button,
+  .input-row input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+
+  details.assumptions{
+    margin-top:6px;
+    border-top:1px solid var(--navy-pale);
+    padding-top:18px;
+  }
+  details.assumptions summary{
+    cursor:pointer;
+    font-size:12px;
+    letter-spacing:0.06em;
+    color:var(--navy);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .slider-field{margin-bottom:18px;}
+  .slider-field label{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  .slider-field .val{
+    font-family:'Poppins',sans-serif;
+    color:var(--green);
+    font-weight:600;
+  }
+  input[type=range]{
+    width:100%;
+    accent-color:var(--green);
+  }
+  .field-note{
+    font-size:11px;
+    color:#8A8F98;
+    line-height:1.5;
+    margin-top:14px;
+  }
+  .reset-btn{
+    width:100%;
+    margin-top:6px;
+    background:none;
+    border:1px solid var(--navy-pale);
+    color:var(--navy);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:11px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .reset-btn:hover{
+    border-color:var(--green);
+    background:var(--green-pale);
+  }
+
+  /* RESULTS PANEL */
+  .results-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .results{
+    background:var(--white);
+    color:var(--ink);
+    width:100%;
+    max-width:560px;
+    padding:32px 32px 30px;
+    border-radius:12px;
+    border:1px solid var(--navy-pale);
+    box-shadow:0 24px 50px -28px rgba(22,53,97,0.35);
+    position:relative;
+  }
+  .results-head{
+    text-align:center;
+    margin-bottom:6px;
+  }
+  .results-head .title{
+    font-family:'Poppins',sans-serif;
+    font-weight:600;
+    font-size:19px;
+    color:var(--navy);
+  }
+  .results-head .tag{
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#8A8F98;
+    margin-top:4px;
+  }
+  .rule{
+    border:none;
+    border-top:1px solid var(--navy-pale);
+    margin:18px 0;
+  }
+  .line-item{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    margin-bottom:9px;
+    color:#5B6472;
+    font-family:'Inter',sans-serif;
+  }
+  .line-item .amt{
+    color:var(--navy);
+    font-weight:600;
+    font-family:'Poppins',sans-serif;
+  }
+  .headline-stat{
+    text-align:center;
+    padding:14px 0 6px;
+  }
+  .headline-stat .label{
+    font-family:'Inter',sans-serif;
+    font-size:11.5px;
+    color:#8A8F98;
+    text-transform:uppercase;
+    letter-spacing:0.07em;
+    margin-bottom:8px;
+    font-weight:600;
+  }
+  .headline-stat .num{
+    font-family:'Poppins',sans-serif;
+    font-size:42px;
+    font-weight:700;
+    color:var(--green);
+    letter-spacing:-0.01em;
+    line-height:1;
+  }
+  .stat-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin:18px 0 4px;
+  }
+  .stat-box{
+    text-align:center;
+    padding:14px 8px;
+    border-radius:8px;
+  }
+  .stat-box.money{background:var(--green-pale);}
+  .stat-box.calls{background:var(--coral-pale);}
+  .stat-box .num{
+    font-family:'Poppins',sans-serif;
+    font-size:21px;
+    font-weight:700;
+  }
+  .stat-box.money .num{color:var(--navy);}
+  .stat-box.calls .num{color:var(--coral);}
+  .stat-box .label{
+    font-family:'Inter',sans-serif;
+    font-size:10px;
+    color:#6B7280;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    margin-top:4px;
+    line-height:1.3;
+    font-weight:600;
+  }
+  .adoption-block{margin-top:20px;}
+  .adoption-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    color:#8A8F98;
+    margin-bottom:6px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    font-weight:600;
+  }
+  .bar-track{
+    height:8px;
+    background:var(--bg);
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:14px;
+  }
+  .bar-fill{
+    height:100%;
+    border-radius:4px;
+    transition:width .35s ease;
+  }
+  .bar-fill.before{background:var(--line);}
+  .bar-fill.after{background:var(--green);}
+  .adoption-nums{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    font-weight:700;
+    font-family:'Poppins',sans-serif;
+    margin-top:-8px;
+    margin-bottom:14px;
+  }
+  .adoption-nums .before{color:#9CA2AA;}
+  .adoption-nums .after{color:var(--green);}
+
+  .results-foot{
+    text-align:center;
+    margin-top:16px;
+    font-size:10px;
+    color:#B0B4BA;
+    letter-spacing:0.03em;
+    font-family:'Inter',sans-serif;
+  }
+
+  .disclaimer{
+    max-width:900px;
+    margin:36px auto 0;
+    font-size:11px;
+    line-height:1.6;
+    color:#8A8F98;
+  }
+  .disclaimer strong{color:var(--navy);}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <div class="brandmark" style="margin-bottom:14px;">
+          <svg class="chevrons" viewBox="0 0 26 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 1 L24 9 L21 11 L13 5 L5 11 L2 9 Z" fill="#7ABDA0"/>
+            <path d="M13 9 L24 17 L21 19 L13 13 L5 19 L2 17 Z" fill="#9FCDB9" opacity="0.85"/>
+            <path d="M13 16 L24 24 L21 24 L13 19.5 L5 24 L2 24 Z" fill="#D3E7DD" opacity="0.75"/>
+          </svg>
+          <span class="word">CATALIS</span>
+        </div>
+        <p class="eyebrow">Payments Team &middot; Internal Demo Build</p>
+        <h1>Digital Payments ROI Calculator</h1>
+      </div>
+      <p>Estimate staff hours, labor cost, and call-volume savings from shifting manual payers to self-service digital payment. Adjust the assumptions panel live during the demo.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+  <div class="grid">
+
+    <!-- INPUTS -->
+    <div class="panel">
+      <h2>Your numbers</h2>
+      <p class="sub">Enter figures for a typical month. All outputs are annualized.</p>
+
+      <div class="field">
+        <label>Bills / statements sent per month <span class="hint">physical + electronic</span></label>
+        <div class="input-row">
+          <input type="number" id="bills" value="2500" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Payers making manual (non-automated) payments <span class="hint">per month</span></label>
+        <div class="input-row">
+          <input type="number" id="manualPayers" value="2000" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Avg. time to process one manual payment</label>
+        <div class="input-row">
+          <input type="number" id="avgTime" value="20" min="0" step="1">
+          <span class="affix right">min</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Monthly billing &amp; payment-related calls</label>
+        <div class="input-row">
+          <input type="number" id="calls" value="2000" min="0" step="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Avg. hourly labor cost for payment staff</label>
+        <div class="input-row">
+          <span class="affix">$</span>
+          <input type="number" id="hourlyCost" value="20" min="0" step="0.5">
+        </div>
+      </div>
+
+      <details class="assumptions" open>
+        <summary>Modernization assumptions</summary>
+
+        <div class="slider-field">
+          <label>Manual volume shifted to digital <span class="val" id="shiftVal">15%</span></label>
+          <input type="range" id="shift" min="0" max="60" value="15" step="1">
+        </div>
+
+        <div class="slider-field">
+          <label>Call-volume drop vs. shift rate <span class="val" id="callSensVal">100%</span></label>
+          <input type="range" id="callSens" min="0" max="150" value="100" step="5">
+        </div>
+
+        <p class="field-note">
+          These two levers are the demo's editable story: "shift" is the share of manual payers you project will move to self-service in year one. "Call sensitivity" scales how much support-call volume falls relative to that shift &mdash; 100% means calls drop in lockstep with manual payment volume.
+        </p>
+      </details>
+
+      <button class="reset-btn" id="resetBtn">Reset to illustrative defaults</button>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results-wrap">
+      <div class="results">
+        <div class="results-head">
+          <div class="title">Estimated Year-1 Impact</div>
+          <div class="tag">Projected &middot; Not a guarantee of results</div>
+        </div>
+        <hr class="rule">
+
+        <div class="line-item"><span>Manual processing hours / yr (today)</span><span class="amt" id="hoursBefore">—</span></div>
+        <div class="line-item"><span>Manual processing hours / yr (after)</span><span class="amt" id="hoursAfter">—</span></div>
+
+        <div class="headline-stat">
+          <div class="label">Staff hours freed up annually</div>
+          <div class="num" id="hoursSaved">—</div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-box money">
+            <div class="num" id="dollarsSaved">—</div>
+            <div class="label">Labor cost saved / yr</div>
+          </div>
+          <div class="stat-box calls">
+            <div class="num" id="callsSaved">—</div>
+            <div class="label">Fewer billing calls / yr</div>
+          </div>
+        </div>
+
+        <hr class="rule">
+
+        <div class="adoption-block">
+          <div class="adoption-row"><span>Digital adoption rate</span><span>before &rarr; after</span></div>
+          <div class="bar-track">
+            <div class="bar-fill before" id="barBefore" style="width:0%"></div>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill after" id="barAfter" style="width:0%"></div>
+          </div>
+          <div class="adoption-nums">
+            <span class="before" id="adoptBefore">—</span>
+            <span class="after" id="adoptAfter">—</span>
+          </div>
+        </div>
+
+        <div class="results-foot">Internal estimate &middot; generated for demo purposes</div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="disclaimer">
+    <strong>For internal demo use only.</strong> This tool illustrates the mechanics of a payments-modernization savings case using figures you supply and two adjustable assumptions (shift rate and call sensitivity). It is not built from any vendor's proprietary model or dataset and does not represent a quote, benchmark, or guarantee. Treat every output as directional &mdash; useful for framing a conversation with stakeholders, not for finance sign-off. Replace the default numbers with your team's real figures before presenting.
+  </p>
+
+  </div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fmtInt = n => Math.round(n).toLocaleString('en-US');
+  const fmtMoney = n => '$' + Math.round(n).toLocaleString('en-US');
+
+  const ids = ['bills','manualPayers','avgTime','calls','hourlyCost'];
+  const shiftEl = $('shift');
+  const callSensEl = $('callSens');
+
+  function calc(){
+    const B = parseFloat($('bills').value) || 0;
+    const M = parseFloat($('manualPayers').value) || 0;
+    const T = parseFloat($('avgTime').value) || 0;
+    const C = parseFloat($('calls').value) || 0;
+    const H = parseFloat($('hourlyCost').value) || 0;
+    const shift = (parseFloat(shiftEl.value) || 0) / 100;
+    const callSens = (parseFloat(callSensEl.value) || 0) / 100;
+
+    $('shiftVal').textContent = Math.round(shift*100) + '%';
+    $('callSensVal').textContent = Math.round(callSens*100) + '%';
+
+    const hoursBefore = M * 12 * (T/60);
+    const hoursAfter = hoursBefore * (1 - shift);
+    const hoursSaved = hoursBefore - hoursAfter;
+    const dollarsSaved = hoursSaved * H;
+
+    const callsBeforeYr = C * 12;
+    const callReductionRate = Math.min(shift * callSens, 1);
+    const callsAfterYr = callsBeforeYr * (1 - callReductionRate);
+    const callsSaved = callsBeforeYr - callsAfterYr;
+
+    const adoptBefore = B > 0 ? Math.max(0, (B - M) / B) * 100 : 0;
+    const Mafter = M * (1 - shift);
+    const adoptAfter = B > 0 ? Math.max(0, (B - Mafter) / B) * 100 : 0;
+
+    $('hoursBefore').textContent = fmtInt(hoursBefore) + ' hrs';
+    $('hoursAfter').textContent = fmtInt(hoursAfter) + ' hrs';
+    $('hoursSaved').textContent = fmtInt(hoursSaved);
+    $('dollarsSaved').textContent = fmtMoney(dollarsSaved);
+    $('callsSaved').textContent = fmtInt(callsSaved);
+
+    $('adoptBefore').textContent = adoptBefore.toFixed(1) + '%';
+    $('adoptAfter').textContent = adoptAfter.toFixed(1) + '%';
+    $('barBefore').style.width = Math.min(adoptBefore,100) + '%';
+    $('barAfter').style.width = Math.min(adoptAfter,100) + '%';
+  }
+
+  ids.forEach(id => $(id).addEventListener('input', calc));
+  shiftEl.addEventListener('input', calc);
+  callSensEl.addEventListener('input', calc);
+
+  $('resetBtn').addEventListener('click', () => {
+    $('bills').value = 2500;
+    $('manualPayers').value = 2000;
+    $('avgTime').value = 20;
+    $('calls').value = 2000;
+    $('hourlyCost').value = 20;
+    shiftEl.value = 15;
+    callSensEl.value = 100;
+    calc();
+  });
+
+  calc();
+</script>
+</body>
+</html>
